@@ -29,7 +29,11 @@ func TestCreateLink(t *testing.T) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fmt.Println(res)
+	byteRes, err := json.Marshal(res)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(string(byteRes))
 }
 func TestGetLinkDetail(t *testing.T) {
 	res, err := GetLinkDetail("token", opt)

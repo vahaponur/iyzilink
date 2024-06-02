@@ -67,7 +67,6 @@ type IyziOptions struct {
 }
 
 func CreateLink(c CreateLinkRequest, options IyziOptions) (CreateLinkResponse, error) {
-
 	var res CreateLinkResponse
 	authStr, err := createAuthStr(options.ApiKey, options.SecretKey, options.BaseUrl, c)
 	if err != nil {
@@ -87,11 +86,9 @@ func CreateLink(c CreateLinkRequest, options IyziOptions) (CreateLinkResponse, e
 	if err != nil {
 		return res, err
 	}
-
 	if resp.IsError() {
 		return res, fmt.Errorf(string(resp.Body()))
 	}
-
 	if res.Status != "success" {
 		return res, fmt.Errorf(string(resp.Body()))
 	}
@@ -114,11 +111,9 @@ func GetLinkDetail(token string, options IyziOptions) (LinkDetailResponse, error
 	if err != nil {
 		return res, err
 	}
-	fmt.Println("Response Body:", string(resp.Body()))
 	if resp.IsError() {
 		return res, fmt.Errorf(string(resp.Body()))
 	}
-
 	if res.Status != "success" {
 		return res, fmt.Errorf(string(resp.Body()))
 	}
@@ -140,11 +135,9 @@ func DeleteLink(token string, options IyziOptions) (DeleteLinkResponse, error) {
 	if err != nil {
 		return res, err
 	}
-	fmt.Println("Response Body:", string(resp.Body()))
 	if resp.IsError() {
 		return res, fmt.Errorf(string(resp.Body()))
 	}
-
 	if res.Status != "success" {
 		return res, fmt.Errorf(string(resp.Body()))
 	}

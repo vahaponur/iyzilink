@@ -1,6 +1,6 @@
 # iyzilink
 ```shell
-go get github.com/vahaponur/iyzilink@v1.1.0
+go get github.com/vahaponur/iyzilink@v1.2.0
 
 ```
 ## CreateLinkRequest
