@@ -19,6 +19,11 @@ type CreateLinkRequest struct {
     InstallmentRequested bool    `json:"installmentRequested"`
     EncodedImageFile     string  `json:"encodedImageFile"`
 }
+opt := IyziOptions{
+ApiKey:    "YOUR_API_KEY",
+SecretKey: "YOUR_SECRET_KEY",
+BaseUrl:   "https://api.iyzipay.com/v2/iyzilink/products",
+}
 ```
 ```go
 c := CreateLinkRequest{
@@ -33,7 +38,7 @@ CurrencyCode:         "TRY",
 EncodedImageFile:     "base64image",
 Description:          "Resim Temsilidir",
 }
-res, err := CreateLink("key", "secret", "https://api.iyzipay.com/v2/iyzilink/products?"+"locale=tr&conversationId=lnv", c)
+res, err := CreateLink(opt, c)
 ```
 ```go
 type CreateLinkResponse struct {
