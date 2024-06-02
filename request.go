@@ -29,6 +29,10 @@ type CreateLinkResponse struct {
 		ImageURL string `json:"imageUrl"`
 	} `json:"data"`
 }
+type DeleteLinkResponse struct {
+	Status     string `json:"status"`
+	SystemTime int64  `json:"systemTime"`
+}
 type LinkDetailResponse struct {
 	Status         string `json:"status"`
 	Locale         string `json:"locale"`
@@ -107,6 +111,32 @@ func GetLinkDetail(token string, options IyziOptions) (LinkDetailResponse, error
 		SetHeader("Content-Type", "application/json").
 		SetResult(&res).
 		Get(endPoint)
+	if err != nil {
+		return res, err
+	}
+	fmt.Println("Response Body:", string(resp.Body()))
+	if resp.IsError() {
+		return res, fmt.Errorf(string(resp.Body()))
+	}
+
+	if res.Status != "success" {
+		return res, fmt.Errorf(string(resp.Body()))
+	}
+	return res, nil
+}
+func DeleteLink(token string, options IyziOptions) (DeleteLinkResponse, error) {
+	var res DeleteLinkResponse
+	endPoint := fmt.Sprintf("%s/%s", options.BaseUrl, token)
+	authStr, err := createAuthStr(options.ApiKey, options.SecretKey, endPoint, nil)
+	if err != nil {
+		return DeleteLinkResponse{}, err
+	}
+	client := resty.New()
+	resp, err := client.R().
+		SetHeader("Authorization", authStr).
+		SetHeader("Content-Type", "application/json").
+		SetResult(&res).
+		Delete(endPoint)
 	if err != nil {
 		return res, err
 	}

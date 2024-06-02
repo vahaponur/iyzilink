@@ -42,3 +42,14 @@ func TestGetLinkDetail(t *testing.T) {
 	}
 	fmt.Println(string(byteRes))
 }
+func TestDeleteLink(t *testing.T) {
+	res, err := DeleteLink("token", opt)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	byteRes, err := json.Marshal(res)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(string(byteRes))
+}
