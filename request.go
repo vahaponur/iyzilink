@@ -29,16 +29,46 @@ type CreateLinkResponse struct {
 		ImageURL string `json:"imageUrl"`
 	} `json:"data"`
 }
+type LinkDetailResponse struct {
+	Status         string `json:"status"`
+	Locale         string `json:"locale"`
+	SystemTime     int64  `json:"systemTime"`
+	ConversationID string `json:"conversationId"`
+	Data           struct {
+		Name                 string        `json:"name"`
+		ConversationID       string        `json:"conversationId"`
+		Description          string        `json:"description"`
+		Price                float64       `json:"price"`
+		CurrencyID           int           `json:"currencyId"`
+		CurrencyCode         string        `json:"currencyCode"`
+		Token                string        `json:"token"`
+		ProductType          string        `json:"productType"`
+		ProductStatus        string        `json:"productStatus"`
+		MerchantID           int           `json:"merchantId"`
+		URL                  string        `json:"url"`
+		ImageURL             string        `json:"imageUrl"`
+		AddressIgnorable     bool          `json:"addressIgnorable"`
+		SoldCount            int           `json:"soldCount"`
+		InstallmentRequested bool          `json:"installmentRequested"`
+		StockEnabled         bool          `json:"stockEnabled"`
+		StockCount           int           `json:"stockCount"`
+		PresetPriceValues    []interface{} `json:"presetPriceValues"`
+		FlexibleLink         bool          `json:"flexibleLink"`
+	} `json:"data"`
+}
 type IyziOptions struct {
 	ApiKey    string `json:"apiKey"`
 	SecretKey string `json:"secretKey"`
 	BaseUrl   string `json:"baseUrl"`
 }
 
-func CreateLink(options IyziOptions, c CreateLinkRequest) (CreateLinkResponse, error) {
+func CreateLink(c CreateLinkRequest, options IyziOptions) (CreateLinkResponse, error) {
 
 	var res CreateLinkResponse
-	authStr := createAuthStr(options.ApiKey, options.SecretKey, options.BaseUrl, c)
+	authStr, err := createAuthStr(options.ApiKey, options.SecretKey, options.BaseUrl, c)
+	if err != nil {
+		return CreateLinkResponse{}, err
+	}
 	client := resty.New()
 	ma, err := json.Marshal(c)
 	resp, err := client.R().
@@ -63,4 +93,30 @@ func CreateLink(options IyziOptions, c CreateLinkRequest) (CreateLinkResponse, e
 	}
 	return res, nil
 
+}
+func GetLinkDetail(token string, options IyziOptions) (LinkDetailResponse, error) {
+	var res LinkDetailResponse
+	endPoint := fmt.Sprintf("%s/%s", options.BaseUrl, token)
+	authStr, err := createAuthStr(options.ApiKey, options.SecretKey, endPoint, nil)
+	if err != nil {
+		return LinkDetailResponse{}, err
+	}
+	client := resty.New()
+	resp, err := client.R().
+		SetHeader("Authorization", authStr).
+		SetHeader("Content-Type", "application/json").
+		SetResult(&res).
+		Get(endPoint)
+	if err != nil {
+		return res, err
+	}
+	fmt.Println("Response Body:", string(resp.Body()))
+	if resp.IsError() {
+		return res, fmt.Errorf(string(resp.Body()))
+	}
+
+	if res.Status != "success" {
+		return res, fmt.Errorf(string(resp.Body()))
+	}
+	return res, nil
 }

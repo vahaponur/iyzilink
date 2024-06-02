@@ -12,7 +12,7 @@ import (
 	"unsafe"
 )
 
-func createSignature(random, requestURL string, data interface{}, secret string) string {
+func createSignature(random, requestURL string, data interface{}, secret string) (string, error) {
 
 	startIndex := strings.Index(requestURL, "/v2")
 	endIndex := strings.Index(requestURL, "?")
@@ -22,7 +22,14 @@ func createSignature(random, requestURL string, data interface{}, secret string)
 	} else {
 		uriPath = requestURL[startIndex:]
 	}
-	jsonData, _ := json.Marshal(data)
+	var jsonData []byte
+	var err error
+	if data != nil {
+		jsonData, err = json.Marshal(data)
+		if err != nil {
+			return "", err
+		}
+	}
 	var payload string
 	if len(jsonData) == 0 {
 		payload = uriPath
@@ -34,17 +41,19 @@ func createSignature(random, requestURL string, data interface{}, secret string)
 	h := hmac.New(sha256.New, []byte(secret))
 	h.Write([]byte(dataToEncrypt))
 	signature := hex.EncodeToString(h.Sum(nil))
-	return signature
+	return signature, nil
 }
 
-func createAuthStr(key, secret string, requestURL string, data interface{}) string {
+func createAuthStr(key, secret string, requestURL string, data interface{}) (string, error) {
 	randomStr := getRandomString(12)
-	signature := createSignature(randomStr, requestURL, data, secret)
+	signature, err := createSignature(randomStr, requestURL, data, secret)
+	if err != nil {
+		return "", err
+	}
 	authStr := fmt.Sprintf("apiKey:%s&randomKey:%s&signature:%s", key, randomStr, signature)
 	encodedAuth := base64.StdEncoding.EncodeToString([]byte(authStr))
 	fullStr := fmt.Sprintf("IYZWSv2 %s", encodedAuth)
-
-	return fullStr
+	return fullStr, nil
 }
 
 func getRandomString(size int) string {

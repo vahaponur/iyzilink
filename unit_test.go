@@ -1,16 +1,18 @@
 package iyzilink
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 )
 
+var opt = IyziOptions{
+	ApiKey:    "YOUR_API_KEY",
+	SecretKey: "YOUR_SECRET_KEY",
+	BaseUrl:   "https://api.iyzipay.com/v2/iyzilink/products",
+}
+
 func TestCreateLink(t *testing.T) {
-	opt := IyziOptions{
-		ApiKey:    "YOUR_API_KEY",
-		SecretKey: "YOUR_SECRET_KEY",
-		BaseUrl:   "https://api.iyzipay.com/v2/iyzilink/products",
-	}
 	c := CreateLinkRequest{
 
 		Name:                 "Davetiye 100 Adet",
@@ -23,9 +25,20 @@ func TestCreateLink(t *testing.T) {
 		EncodedImageFile:     "base64Img",
 		Description:          "Resim Temsilidir",
 	}
-	res, err := CreateLink(opt, c)
+	res, err := CreateLink(c, opt)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(res)
+}
+func TestGetLinkDetail(t *testing.T) {
+	res, err := GetLinkDetail("token", opt)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	byteRes, err := json.Marshal(res)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(string(byteRes))
 }
